@@ -6,7 +6,7 @@ const port = 3000;
 app.use(express.json());
 
 // 라우팅 설정
-const userRoute = require('./routes/userRoute');
+const userRoute = require('./route/userRoute');
 app.use('/users', userRoute);
 
 // 서버 시작

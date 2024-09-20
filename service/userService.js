@@ -1,5 +1,5 @@
 // userService.js
-const userModel = require('../models/userModel');
+const userModel = require('../model/userModel');
 
 // 사용자 추가 서비스
 exports.addUser = async (name, email) => {

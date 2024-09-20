@@ -1,5 +1,5 @@
 // userController.js
-const userService = require('../services/userService');
+const userService = require('../service/userService');
 
 // 사용자 추가 요청 처리
 exports.addUser = async (req, res) => {
