@@ -1,21 +1,14 @@
 const userService = require('../service/userService');
 
-exports.addUser = async (req, res) => {
-  try {
-    const { name, email } = req.body;
-    console.log(req.body);
-    const userId = await userService.addUser(name, email);
-    res.status(200).send(`User added with ID: ${userId}`);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-};
+const userService = require('../service/userService');
 
-exports.getAllUsers = async (req, res) => {
+exports.handleUserAuth = async (req, res) => {
+  const { nickname, token, profileImageUrl } = req.body; // email은 token에서 추출
+
   try {
-    const users = await userService.getAllUsers();
-    res.status(200).json(users);
+    await userService.handleUserAuth(nickname, profileImageUrl, token);
+    res.status(200).send('User auth handled successfully.');
   } catch (error) {
-    res.status(500).send(error.message);
+    res.status(500).send('Server Error: ' + error.message);
   }
 };

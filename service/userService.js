@@ -1,21 +1,15 @@
+const firebaseAdmin = require('../config/firebase');
 const userModel = require('../model/userModel');
 
-// 사용자 추가 서비스
-exports.addUser = async (name, email) => {
+exports.handleUserAuth = async (nickname, profileImageUrl, token) => {
   try {
-    const userId = await userModel.addUser(name, email);
-    return userId;
+    const decodedToken = await firebaseAdmin.auth().verifyIdToken(token);
+    const firebaseUid = decodedToken.uid;        // Firebase UID
+    const email = decodedToken.email;            // 토큰에서 이메일 추출
+
+    await userModel.upsertUserProfile(firebaseUid, email, nickname, profileImageUrl);
   } catch (error) {
-    throw new Error('Failed to add user');
+    throw new Error('User auth handling failed: ' + error.message);
   }
 };
 
-// 모든 사용자 조회 서비스
-exports.getAllUsers = async () => {
-  try {
-    const users = await userModel.getAllUsers();
-    return users;
-  } catch (error) {
-    throw new Error('Failed to retrieve users');
-  }
-};
