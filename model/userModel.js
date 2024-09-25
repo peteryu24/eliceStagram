@@ -1,28 +1,19 @@
-// userModel.js
-const db = require('../config/database');
+const db = require('../config/database');  
 
-// 사용자 추가
-exports.addUser = (name, email) => {
-  return new Promise((resolve, reject) => {
-    db.run('INSERT INTO users (name, email) VALUES (?, ?)', [name, email], function(err) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(this.lastID);  // 성공 시 추가된 사용자 ID 반환
-      }
-    });
-  });
+exports.addUser = async (name, email) => {
+  try {
+    const result = await db.query('INSERT INTO users (username, email) VALUES ($1, $2) RETURNING user_id', [name, email]);
+    return result.rows[0].user_id;  
+  } catch (err) {
+    throw err;
+  }
 };
 
-// 모든 사용자 조회
-exports.getAllUsers = () => {
-  return new Promise((resolve, reject) => {
-    db.all('SELECT * FROM users', [], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);  // 사용자 목록 반환
-      }
-    });
-  });
+exports.getAllUsers = async () => {
+  try {
+    const result = await db.query('SELECT * FROM users');
+    return result.rows;  
+  } catch (err) {
+    throw err;
+  }
 };

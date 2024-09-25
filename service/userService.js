@@ -1,4 +1,3 @@
-// userService.js
 const userModel = require('../model/userModel');
 
 // 사용자 추가 서비스

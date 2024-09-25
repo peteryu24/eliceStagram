@@ -1,15 +1,16 @@
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;  
 
-// 미들웨어 설정
 app.use(express.json());
 
-// 라우팅 설정
-const userRoute = require('./route/userRoute');
-app.use('/users', userRoute);
+const userRoute = require('./route/userRoute');   
+// const postRoute = require('./route/feedRoute');   
 
-// 서버 시작
+app.use('/api/users', userRoute);
+// app.use('/api/feed', feedRoute);
+
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

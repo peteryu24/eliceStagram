@@ -1,7 +1,5 @@
-// userController.js
 const userService = require('../service/userService');
 
-// 사용자 추가 요청 처리
 exports.addUser = async (req, res) => {
   try {
     const { name, email } = req.body;
@@ -13,7 +11,6 @@ exports.addUser = async (req, res) => {
   }
 };
 
-// 모든 사용자 조회 요청 처리
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await userService.getAllUsers();
