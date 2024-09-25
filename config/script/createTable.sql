@@ -40,6 +40,7 @@ CREATE TABLE comment (
     comment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES users(user_id) ON DELETE CASCADE,  
     feed_id UUID REFERENCES feed(feed_id) ON DELETE CASCADE,   
+    description TEXT,
     like_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
@@ -48,6 +49,7 @@ COMMENT ON TABLE comment IS '댓글 테이블';
 COMMENT ON COLUMN comment.comment_id IS '댓글 고유 ID';
 COMMENT ON COLUMN comment.user_id IS '댓글 작성자 ID';
 COMMENT ON COLUMN comment.feed_id IS '댓글이 달린 게시글 ID';
+COMMENT ON COLUMN comment.description IS '댓글 텍스트';
 COMMENT ON COLUMN comment.like_count IS '댓글에 대한 좋아요 수';
 COMMENT ON COLUMN comment.created_at IS '댓글 생성 날짜';
 COMMENT ON COLUMN comment.updated_at IS '댓글 수정 날짜';
