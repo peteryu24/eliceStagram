@@ -50,18 +50,26 @@ exports.getAllFeeds = async () => {
   }
 };
 
-// 피드 수정
-exports.updateFeed = async (feed_id, description) => {
+// 피드 수정 (권한 체크)
+exports.updateFeed = async (feed_id, user_id, description) => {
   try {
+    const feed = await feedModel.getFeedById(feed_id);
+    if (feed.user_id !== user_id) {
+      throw new Error("Permission denied");
+    }
     return await feedModel.updateFeed(feed_id, description);
   } catch (error) {
     handleError("updating feed", error);
   }
 };
 
-// 피드 삭제
-exports.deleteFeed = async (feed_id) => {
+// 피드 삭제 (권한 체크)
+exports.deleteFeed = async (feed_id, user_id) => {
   try {
+    const feed = await feedModel.getFeedById(feed_id);
+    if (feed.user_id !== user_id) {
+      throw new Error("Permission denied");
+    }
     return await feedModel.deleteFeed(feed_id);
   } catch (error) {
     handleError("deleting feed", error);
@@ -73,8 +81,12 @@ exports.likeFeed = async (user_id, feed_id) => {
   return processLike(user_id, feed_id, "like");
 };
 
-// 피드 좋아요 취소
+// 피드 좋아요 취소 (권한 체크)
 exports.unlikeFeed = async (user_id, feed_id) => {
+  const existingLike = await feedModel.checkLikeStatus(user_id, feed_id);
+  if (!existingLike) {
+    throw new Error("Didn't like this feed before, cannot unlike.");
+  }
   return processLike(user_id, feed_id, "unlike");
 };
 
