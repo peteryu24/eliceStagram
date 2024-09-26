@@ -1,13 +1,14 @@
-const pool = require("../config/database");
+// model/feedModel.js
+const pool = require('../config/database');
 
 // 피드 생성
-exports.createFeed = async (user_id, description) => {
+exports.createFeed = async (firebase_uid, description) => {
   const query = `
-    INSERT INTO feed (user_id, description, created_at, updated_at)
+    INSERT INTO feed (firebase_uid, description, created_at, updated_at)
     VALUES ($1, $2, NOW(), NOW())
     RETURNING feed_id;
   `;
-  const result = await pool.query(query, [user_id, description]);
+  const result = await pool.query(query, [firebase_uid, description]);
   return result.rows[0].feed_id;
 };
 
@@ -32,7 +33,7 @@ exports.getAllFeeds = async () => {
 // 피드 수정
 exports.updateFeed = async (feed_id, description) => {
   const query = `
-    UPDATE feed 
+    UPDATE feed
     SET description = $1, updated_at = NOW()
     WHERE feed_id = $2
     RETURNING *;
@@ -51,50 +52,74 @@ exports.deleteFeed = async (feed_id) => {
 };
 
 // 피드 좋아요 상태 확인
-exports.checkLikeStatus = async (user_id, feed_id) => {
-  const query = `SELECT * FROM like_status WHERE user_id = $1 AND target_id = $2 AND target_type = 11`;
-  const result = await pool.query(query, [user_id, feed_id]);
-  return result.rowCount > 0; // 좋아요가 존재하면 true
+exports.checkLikeStatus = async (firebase_uid, feed_id) => {
+  const query = `
+    SELECT * FROM like_status
+    WHERE firebase_uid = $1 AND target_id = $2 AND target_type = 11;
+  `;
+  const result = await pool.query(query, [firebase_uid, feed_id]);
+  return result.rowCount > 0;
 };
 
 // 피드 좋아요 추가
-exports.likeFeed = async (user_id, feed_id) => {
-  const query = `
-      INSERT INTO like_status (user_id, target_id, target_type, created_at)
-      VALUES ($1, $2, 11, NOW())
-    `;
-  await pool.query(query, [user_id, feed_id]);
-};
+exports.likeFeed = async (firebase_uid, feed_id) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
 
-// 피드 좋아요 카운트 증가 ++
-exports.incrementLikeCount = async (feed_id) => {
-  const query = `
-      UPDATE feed SET like_count = like_count + 1 WHERE feed_id = $1
+    const insertLikeQuery = `
+      INSERT INTO like_status (firebase_uid, target_id, target_type, created_at)
+      VALUES ($1, $2, 11, NOW());
     `;
-  await pool.query(query, [feed_id]);
+    await client.query(insertLikeQuery, [firebase_uid, feed_id]);
+
+    const incrementLikeCountQuery = `
+      UPDATE feed SET like_count = like_count + 1 WHERE feed_id = $1;
+    `;
+    await client.query(incrementLikeCountQuery, [feed_id]);
+
+    await client.query('COMMIT');
+    return true;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
 };
 
 // 피드 좋아요 취소
-exports.unlikeFeed = async (user_id, feed_id) => {
-  const query = `
-      DELETE FROM like_status WHERE user_id = $1 AND target_id = $2 AND target_type = 11
-    `;
-  await pool.query(query, [user_id, feed_id]);
-};
+exports.unlikeFeed = async (firebase_uid, feed_id) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
 
-// 피드 좋아요 카운트 감소 --
-exports.decrementLikeCount = async (feed_id) => {
-  const query = `
-      UPDATE feed SET like_count = like_count - 1 WHERE feed_id = $1
+    const deleteLikeQuery = `
+      DELETE FROM like_status
+      WHERE firebase_uid = $1 AND target_id = $2 AND target_type = 11;
     `;
-  await pool.query(query, [feed_id]);
+    await client.query(deleteLikeQuery, [firebase_uid, feed_id]);
+
+    const decrementLikeCountQuery = `
+      UPDATE feed SET like_count = like_count - 1 WHERE feed_id = $1;
+    `;
+    await client.query(decrementLikeCountQuery, [feed_id]);
+
+    await client.query('COMMIT');
+    return true;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
 };
 
 // 피드 좋아요 갯수 조회
 exports.getLikeCount = async (feed_id) => {
   const query = `
-      SELECT like_count FROM feed WHERE feed_id = $1
-    `;
+    SELECT like_count FROM feed WHERE feed_id = $1;
+  `;
   const result = await pool.query(query, [feed_id]);
   return result.rows[0].like_count;
 };
