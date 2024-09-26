@@ -1,3 +1,4 @@
+// service/feedService.js
 const feedModel = require('../model/feedModel');
 
 // 공통 에러 처리 함수
@@ -34,7 +35,7 @@ exports.getAllFeeds = async () => {
   }
 };
 
-// 피드 수정
+// 피드 수정 (권한 체크)
 exports.updateFeed = async (feed_id, firebase_uid, description) => {
   try {
     feed_id = feed_id.trim();
@@ -53,7 +54,7 @@ exports.updateFeed = async (feed_id, firebase_uid, description) => {
   }
 };
 
-// 피드 삭제
+// 피드 삭제 (권한 체크)
 exports.deleteFeed = async (feed_id, firebase_uid) => {
   try {
     feed_id = feed_id.trim();
@@ -82,13 +83,18 @@ exports.likeFeed = async (firebase_uid, feed_id) => {
       throw new Error('Feed not found');
     }
 
+    const alreadyLiked = await feedModel.checkLikeStatus(firebase_uid, feed_id);
+    if (alreadyLiked) {
+      throw new Error('Already liked this feed');
+    }
+
     return await feedModel.likeFeed(firebase_uid, feed_id);
   } catch (error) {
     handleError('liking feed', error);
   }
 };
 
-// 피드 좋아요 취소
+// 피드 좋아요 취소 (이미 취소된 경우 처리)
 exports.unlikeFeed = async (firebase_uid, feed_id) => {
   try {
     feed_id = feed_id.trim();
@@ -96,6 +102,11 @@ exports.unlikeFeed = async (firebase_uid, feed_id) => {
 
     if (!feed) {
       throw new Error('Feed not found');
+    }
+
+    const alreadyLiked = await feedModel.checkLikeStatus(firebase_uid, feed_id);
+    if (!alreadyLiked) {
+      throw new Error('Not liked this feed before, cannot unlike');
     }
 
     return await feedModel.unlikeFeed(firebase_uid, feed_id);
