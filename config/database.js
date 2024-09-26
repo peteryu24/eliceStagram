@@ -1,4 +1,4 @@
-require('dotenv').config();  
+require('dotenv').config({ path: './config/script/.env' });  
 
 const { Pool } = require('pg');
 

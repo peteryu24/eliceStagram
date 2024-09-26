@@ -1,7 +1,5 @@
 const userService = require('../service/userService');
 
-const userService = require('../service/userService');
-
 exports.handleUserAuth = async (req, res) => {
   const { nickname, token, profileImageUrl } = req.body; // email은 token에서 추출
 
