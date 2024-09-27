@@ -14,19 +14,21 @@ exports.createComment = async (firebase_uid, feed_id, description) => {
 // 단일 댓글 조회
 exports.getCommentById = async (comment_id) => {
   const query = `
-    SELECT * FROM comment WHERE comment_id = $1;
+    SELECT comment_id, firebase_uid, feed_id, description, like_count, created_at 
+    FROM comment WHERE comment_id = $1;
   `;
   const result = await pool.query(query, [comment_id]);
-  return result.rows[0];
+  return result.rows[0];  // 'created_at' 포함
 };
 
 // 특정 피드에 대한 모든 댓글 조회
 exports.getAllCommentsByFeedId = async (feed_id) => {
   const query = `
-    SELECT * FROM comment WHERE feed_id = $1 ORDER BY created_at DESC;
+    SELECT comment_id, firebase_uid, description, like_count, created_at 
+    FROM comment WHERE feed_id = $1;
   `;
   const result = await pool.query(query, [feed_id]);
-  return result.rows;
+  return result.rows;  // 'created_at' 포함
 };
 
 // 댓글 수정

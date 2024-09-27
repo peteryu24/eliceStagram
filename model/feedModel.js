@@ -15,7 +15,8 @@ exports.createFeed = async (firebase_uid, description) => {
 // 단일 피드 조회
 exports.getFeedById = async (feed_id) => {
   const query = `
-    SELECT * FROM feed WHERE feed_id = $1;
+    SELECT feed_id, firebase_uid, description, like_count, comment_count, created_at
+    FROM feed WHERE feed_id = $1;
   `;
   const result = await pool.query(query, [feed_id]);
   return result.rows[0];
@@ -24,12 +25,12 @@ exports.getFeedById = async (feed_id) => {
 // 모든 피드 조회
 exports.getAllFeeds = async () => {
   const query = `
-    SELECT * FROM feed;
+    SELECT feed_id, firebase_uid, description, like_count, comment_count, created_at
+    FROM feed;
   `;
   const result = await pool.query(query);
   return result.rows;
 };
-
 // 피드 수정
 exports.updateFeed = async (feed_id, description) => {
   const query = `
