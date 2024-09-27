@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const feedController = require('../controller/feedController');
-// const authMiddleware = require('../config/authMiddleware'); 
-const testAuthMiddleware = require('../config/testAuthMiddleware');
+const authMiddleware = require('../config/authMiddleware'); 
+// const testAuthMiddleware = require('../config/testAuthMiddleware');
 // 인증 미들웨어 적용
-//router.use(authMiddleware);
-router.use(testAuthMiddleware);
+router.use(authMiddleware);
+// router.use(testAuthMiddleware);
 
 // 피드 생성
 router.post('/', feedController.createFeed);
