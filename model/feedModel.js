@@ -88,18 +88,20 @@ exports.likeFeed = async (firebase_uid, feed_id) => {
   }
 };
 
-// 피드 좋아요 취소 (음수 방지 로직 추가)
+// model/feedModel.js
+
+// 피드 좋아요 취소
 exports.unlikeFeed = async (firebase_uid, feed_id) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
 
-    // 먼저 좋아요 상태를 확인
-    const checkLikeQuery = `
+    // 좋아요 상태 확인
+    const checkLikeStatusQuery = `
       SELECT * FROM like_status
       WHERE firebase_uid = $1 AND target_id = $2 AND target_type = 11;
     `;
-    const likeStatusResult = await client.query(checkLikeQuery, [firebase_uid, feed_id]);
+    const likeStatusResult = await client.query(checkLikeStatusQuery, [firebase_uid, feed_id]);
 
     // 만약 좋아요를 한 기록이 없다면 취소 불가
     if (likeStatusResult.rowCount === 0) {
@@ -128,6 +130,7 @@ exports.unlikeFeed = async (firebase_uid, feed_id) => {
     client.release();
   }
 };
+
 
 // 피드 좋아요 갯수 조회
 exports.getLikeCount = async (feed_id) => {
