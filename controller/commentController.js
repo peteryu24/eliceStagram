@@ -1,6 +1,27 @@
 const commentService = require('../service/commentService');
 const { validate: isUuid } = require('uuid');
 
+// 공통 응답 처리 함수
+const snsAppResponse = (res, promise, successMessage, notFoundMessage) => {
+  promise
+    .then((result) => {
+      if (result !== undefined && result !== null) {
+        res.status(200).json({ message: successMessage, result });
+      } else {
+        res.status(404).json({ message: notFoundMessage });
+      }
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+
+      if (error.message.includes('Permission denied')) {
+        res.status(403).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: `Error: ${error.message}` });
+      }
+    });
+};
+
 // 댓글 생성
 exports.createComment = (req, res) => {
   const { description } = req.body;
@@ -89,68 +110,67 @@ exports.deleteComment = (req, res) => {
 
 // 댓글 좋아요 누르기
 exports.likeComment = (req, res) => {
-    const { comment_id } = req.params;
-    const firebase_uid = req.firebase_uid;
-  
-    if (!isUuid(comment_id)) {
-      return res.status(400).json({ message: 'Invalid comment_id format' });
-    }
-  
-    snsAppResponse(
-      res,
-      commentService.likeComment(firebase_uid, comment_id),
-      'Comment liked',
-      `Comment with ID ${comment_id} not found`
-    );
-  };
-  
-  // 댓글 좋아요 취소
-  exports.unlikeComment = (req, res) => {
-    const { comment_id } = req.params;
-    const firebase_uid = req.firebase_uid;
-  
-    if (!isUuid(comment_id)) {
-      return res.status(400).json({ message: 'Invalid comment_id format' });
-    }
-  
-    snsAppResponse(
-      res,
-      commentService.unlikeComment(firebase_uid, comment_id),
-      'Comment unliked',
-      `Comment with ID ${comment_id} not found`
-    );
-  };
-  
-  // 댓글 좋아요 상태 확인
-  exports.checkCommentLikeStatus = (req, res) => {
-    const { comment_id } = req.params;
-    const firebase_uid = req.firebase_uid;
-  
-    if (!isUuid(comment_id)) {
-      return res.status(400).json({ message: 'Invalid comment_id format' });
-    }
-  
-    snsAppResponse(
-      res,
-      commentService.checkCommentLikeStatus(firebase_uid, comment_id),
-      'Like status retrieved',
-      `Comment with ID ${comment_id} not found`
-    );
-  };
-  
-  // 댓글 좋아요 갯수 확인
-  exports.getCommentLikeCount = (req, res) => {
-    const { comment_id } = req.params;
-  
-    if (!isUuid(comment_id)) {
-      return res.status(400).json({ message: 'Invalid comment_id format' });
-    }
-  
-    snsAppResponse(
-      res,
-      commentService.getCommentLikeCount(comment_id),
-      'Like count retrieved',
-      `Comment with ID ${comment_id} not found`
-    );
-  };
-  
+  const { comment_id } = req.params;
+  const firebase_uid = req.firebase_uid;
+
+  if (!isUuid(comment_id)) {
+    return res.status(400).json({ message: 'Invalid comment_id format' });
+  }
+
+  snsAppResponse(
+    res,
+    commentService.likeComment(firebase_uid, comment_id),
+    'Comment liked',
+    `Comment with ID ${comment_id} not found`
+  );
+};
+
+// 댓글 좋아요 취소
+exports.unlikeComment = (req, res) => {
+  const { comment_id } = req.params;
+  const firebase_uid = req.firebase_uid;
+
+  if (!isUuid(comment_id)) {
+    return res.status(400).json({ message: 'Invalid comment_id format' });
+  }
+
+  snsAppResponse(
+    res,
+    commentService.unlikeComment(firebase_uid, comment_id),
+    'Comment unliked',
+    `Comment with ID ${comment_id} not found`
+  );
+};
+
+// 댓글 좋아요 상태 확인
+exports.checkCommentLikeStatus = (req, res) => {
+  const { comment_id } = req.params;
+  const firebase_uid = req.firebase_uid;
+
+  if (!isUuid(comment_id)) {
+    return res.status(400).json({ message: 'Invalid comment_id format' });
+  }
+
+  snsAppResponse(
+    res,
+    commentService.checkCommentLikeStatus(firebase_uid, comment_id),
+    'Like status retrieved',
+    `Comment with ID ${comment_id} not found`
+  );
+};
+
+// 댓글 좋아요 갯수 확인
+exports.getCommentLikeCount = (req, res) => {
+  const { comment_id } = req.params;
+
+  if (!isUuid(comment_id)) {
+    return res.status(400).json({ message: 'Invalid comment_id format' });
+  }
+
+  snsAppResponse(
+    res,
+    commentService.getCommentLikeCount(comment_id),
+    'Like count retrieved',
+    `Comment with ID ${comment_id} not found`
+  );
+};
