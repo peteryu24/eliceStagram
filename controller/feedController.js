@@ -1,5 +1,3 @@
-// controller/feedController.js
-
 const feedService = require('../service/feedService');
 const { validate: isUuid } = require('uuid');
 

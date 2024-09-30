@@ -3,7 +3,6 @@ const router = express.Router();
 const commentController = require('../controller/commentController');
 const authMiddleware = require('../config/authMiddleware'); 
 
-// 인증 미들웨어 적용
 router.use(authMiddleware);
 
 // 댓글 생성

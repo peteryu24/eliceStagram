@@ -18,7 +18,7 @@ exports.getUserByFirebaseUid = async (firebase_uid) => {
   return result.rows[0];
 };
 
-// 유저 정보 업데이트
+// 유저 업데이트
 exports.updateUser = async (firebase_uid, username, profile_image_url) => {
   const query = `
     UPDATE users

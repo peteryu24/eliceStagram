@@ -18,7 +18,7 @@ exports.getCommentById = async (comment_id) => {
     FROM comment WHERE comment_id = $1;
   `;
   const result = await pool.query(query, [comment_id]);
-  return result.rows[0];  // 'created_at' 포함
+  return result.rows[0]; 
 };
 
 // 특정 피드에 대한 모든 댓글 조회
@@ -28,7 +28,7 @@ exports.getAllCommentsByFeedId = async (feed_id) => {
     FROM comment WHERE feed_id = $1;
   `;
   const result = await pool.query(query, [feed_id]);
-  return result.rows;  // 'created_at' 포함
+  return result.rows;  
 };
 
 // 댓글 수정
@@ -89,7 +89,8 @@ exports.checkCommentLikeStatus = async (firebase_uid, comment_id) => {
     }
   };
   
-  // 댓글 좋아요 취소
+  // 댓글 좋아요 취소 
+  // 댓글 어뷰징 방지
   exports.unlikeComment = async (firebase_uid, comment_id) => {
     const client = await pool.connect();
     try {
@@ -106,6 +107,7 @@ exports.checkCommentLikeStatus = async (firebase_uid, comment_id) => {
       `;
       await client.query(decrementLikeCountQuery, [comment_id]);
   
+      // 좋아요 취소 - 카운트 감소
       await client.query('COMMIT');
       return true;
     } catch (error) {

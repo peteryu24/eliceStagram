@@ -7,7 +7,7 @@ app.use(express.json());
 const userRoute = require('./route/userRoute');
 const feedRoute = require('./route/feedRoute');  
 
-app.use('/api/users', userRoute);
+app.use('/api/user', userRoute);
 app.use('/api/feed', feedRoute); 
 
 app.listen(port, () => {

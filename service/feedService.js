@@ -1,4 +1,3 @@
-// service/feedService.js
 const feedModel = require('../model/feedModel');
 
 // 공통 에러 처리 함수
