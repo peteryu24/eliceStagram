@@ -24,16 +24,17 @@ const snsAppResponse = (res, promise, successMessage, notFoundMessage) => {
 
 // 피드 생성
 exports.createFeed = (req, res) => {
-  const { description } = req.body;
+  const { description, imageUrls } = req.body; // imageUrls는 배열로
   const firebase_uid = req.firebase_uid;
 
   snsAppResponse(
     res,
-    feedService.createFeed(firebase_uid, description),
+    feedService.createFeed(firebase_uid, description, imageUrls),  
     'Feed created',
     'Failed to create feed'
   );
 };
+
 
 // 단일 피드 조회
 exports.getFeedById = (req, res) => {
