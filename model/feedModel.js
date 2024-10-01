@@ -25,7 +25,8 @@ exports.getFeedById = async (feed_id) => {
 exports.getAllFeeds = async () => {
   const query = `
     SELECT feed_id, firebase_uid, description, like_count, comment_count, created_at
-    FROM feed;
+    FROM feed
+    ORDER BY created_at DESC;
   `;
   const result = await pool.query(query);
   return result.rows;
