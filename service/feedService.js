@@ -78,6 +78,42 @@ exports.deleteFeed = async (feed_id, firebase_uid) => {
   }
 };
 
+// 피드 이미지 수정
+exports.updateFeedImage = async (firebase_uid, feed_id, image_id, newImageUrl) => {
+  try {
+    const feed = await feedModel.getFeedById(feed_id);
+
+    if (!feed || feed.firebase_uid !== firebase_uid) {
+      throw new Error('Permission denied');
+    }
+
+    return await feedModel.updateFeedImage(feed_id, image_id, newImageUrl);
+  } catch (error) {
+    handleError('updating feed image', error);
+  }
+};
+
+// 피드 이미지 삭제
+exports.deleteFeedImage = async (firebase_uid, feed_id, image_id) => {
+  try {
+    const feed = await feedModel.getFeedById(feed_id);
+
+    if (!feed || feed.firebase_uid !== firebase_uid) {
+      throw new Error('Permission denied');
+    }
+
+    const imageCount = await feedModel.getFeedImageCount(feed_id);
+    if (imageCount <= 1) {
+      throw new Error('Can\'t delete last image, need at least one image');
+    }
+
+    return await feedModel.deleteFeedImage(feed_id, image_id);
+  } catch (error) {
+    handleError('deleting feed image', error);
+  }
+};
+
+
 // 피드 좋아요 누르기
 exports.likeFeed = async (firebase_uid, feed_id) => {
   try {

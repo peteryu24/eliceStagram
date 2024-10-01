@@ -77,6 +77,39 @@ exports.deleteFeed = async (feed_id) => {
   return result.rowCount > 0;
 };
 
+// 피드 이미지 수정
+exports.updateFeedImage = async (feed_id, image_id, newImageUrl) => {
+  const query = `
+    UPDATE feed_image
+    SET image_url = $1, updated_at = NOW()
+    WHERE feed_id = $2 AND feed_image_id = $3;
+  `;
+  const result = await pool.query(query, [newImageUrl, feed_id, image_id]);
+  return result.rowCount > 0;
+};
+
+// 피드 이미지 삭제
+exports.deleteFeedImage = async (feed_id, image_id) => {
+  const query = `
+    DELETE FROM feed_image
+    WHERE feed_id = $1 AND feed_image_id = $2;
+  `;
+  const result = await pool.query(query, [feed_id, image_id]);
+  return result.rowCount > 0;
+};
+
+// 피드 이미지 수 확인
+exports.getFeedImageCount = async (feed_id) => {
+  const query = `
+    SELECT COUNT(*) as image_count
+    FROM feed_image
+    WHERE feed_id = $1;
+  `;
+  const result = await pool.query(query, [feed_id]);
+  return parseInt(result.rows[0].image_count, 10);
+};
+
+
 // 피드 좋아요 상태 확인
 exports.checkLikeStatus = async (firebase_uid, feed_id) => {
   const query = `

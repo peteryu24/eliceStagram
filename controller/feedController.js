@@ -100,6 +100,34 @@ exports.deleteFeed = (req, res) => {
   );
 };
 
+// 피드 이미지 수정
+exports.updateFeedImage = (req, res) => {
+  const { feed_id, image_id } = req.params;
+  const { newImageUrl } = req.body;
+  const firebase_uid = req.firebase_uid;
+
+  snsAppResponse(
+    res,
+    feedService.updateFeedImage(firebase_uid, feed_id, image_id, newImageUrl),
+    'Feed image updated',
+    'Failed to update feed image'
+  );
+};
+
+// 피드 이미지 삭제
+exports.deleteFeedImage = (req, res) => {
+  const { feed_id, image_id } = req.params;
+  const firebase_uid = req.firebase_uid;
+
+  snsAppResponse(
+    res,
+    feedService.deleteFeedImage(firebase_uid, feed_id, image_id),
+    'Feed image deleted',
+    'Can\'t delete feed image'
+  );
+};
+
+
 // 피드 좋아요 누르기
 exports.likeFeed = (req, res) => {
   const { feed_id } = req.params;
