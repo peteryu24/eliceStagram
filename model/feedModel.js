@@ -36,26 +36,36 @@ exports.addFeedImages = async (feed_id, imageUrls) => {
 };
 
 
-// 단일 피드 조회
+// 단일 피드 조회 (
 exports.getFeedById = async (feed_id) => {
   const query = `
-    SELECT feed_id, firebase_uid, description, like_count, comment_count, created_at
-    FROM feed WHERE feed_id = $1;
+    SELECT f.feed_id, f.firebase_uid, f.description, f.like_count, f.comment_count, f.created_at, 
+           json_agg(fi.image_url) AS images
+    FROM feed f
+    LEFT JOIN feed_image fi ON f.feed_id = fi.feed_id
+    WHERE f.feed_id = $1
+    GROUP BY f.feed_id;
   `;
   const result = await pool.query(query, [feed_id]);
   return result.rows[0];
 };
 
-// 모든 피드 조회
+
+// 모든 피드 조회 
 exports.getAllFeeds = async () => {
   const query = `
-    SELECT feed_id, firebase_uid, description, like_count, comment_count, created_at
-    FROM feed
-    ORDER BY created_at DESC;
+    SELECT f.feed_id, f.firebase_uid, f.description, f.like_count, f.comment_count, f.created_at, 
+           json_agg(fi.image_url) AS images
+    FROM feed f
+    LEFT JOIN feed_image fi ON f.feed_id = fi.feed_id
+    GROUP BY f.feed_id
+    ORDER BY f.created_at DESC;
   `;
   const result = await pool.query(query);
   return result.rows;
 };
+
+
 // 피드 수정
 exports.updateFeed = async (feed_id, description) => {
   const query = `
