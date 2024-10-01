@@ -11,6 +11,31 @@ exports.createFeed = async (firebase_uid, description) => {
   return result.rows[0].feed_id;
 };
 
+// 피드 이미지 추가
+exports.addFeedImages = async (feed_id, imageUrls) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const insertImageQuery = `
+      INSERT INTO feed_image (feed_id, image_url, created_at, updated_at)
+      VALUES ($1, $2, NOW(), NOW());
+    `;
+
+    for (const imageUrl of imageUrls) {
+      await client.query(insertImageQuery, [feed_id, imageUrl]);
+    }
+
+    await client.query('COMMIT');
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+
 // 단일 피드 조회
 exports.getFeedById = async (feed_id) => {
   const query = `

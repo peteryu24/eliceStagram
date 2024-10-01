@@ -7,14 +7,20 @@ const handleError = (action, error) => {
 };
 
 // 피드 생성
-exports.createFeed = async (firebase_uid, description) => {
+exports.createFeed = async (firebase_uid, description, imageUrls) => {
   try {
     const feedId = await feedModel.createFeed(firebase_uid, description);
+    
+    if (imageUrls && imageUrls.length > 0) {
+      await feedModel.addFeedImages(feedId, imageUrls);
+    }
+
     return feedId;
   } catch (error) {
     handleError('creating feed', error);
   }
 };
+
 
 // 단일 피드 조회
 exports.getFeedById = async (feed_id) => {
