@@ -20,6 +20,12 @@ const snsAppResponse = (res, promise, successMessage, notFoundMessage) => {
 // 알림 생성
 exports.createNotification = (req, res) => {
   const { receiver_id, actor_id, target_id, target_type, notification_type } = req.body;
+  
+  // UUID 검증
+  if (!isUuid(receiver_id) || !isUuid(actor_id) || !isUuid(target_id)) {
+    return res.status(400).json({ message: 'Invalid UUID format' });
+  }
+
   snsAppResponse(
     res,
     notificationService.createNotification(receiver_id, actor_id, target_id, target_type, notification_type),
@@ -31,6 +37,12 @@ exports.createNotification = (req, res) => {
 // 사용자의 모든 알림 조회
 exports.getNotificationsByUserId = (req, res) => {
   const { receiver_id } = req.params;
+
+  // UUID 검증
+  if (!isUuid(receiver_id)) {
+    return res.status(400).json({ message: 'Invalid UUID format' });
+  }
+
   snsAppResponse(
     res,
     notificationService.getNotificationsByUserId(receiver_id),
@@ -42,6 +54,12 @@ exports.getNotificationsByUserId = (req, res) => {
 // 알림 읽음 처리
 exports.markAsRead = (req, res) => {
   const { notification_id } = req.params;
+
+  // UUID 검증
+  if (!isUuid(notification_id)) {
+    return res.status(400).json({ message: 'Invalid UUID format' });
+  }
+
   snsAppResponse(
     res,
     notificationService.markAsRead(notification_id),
@@ -53,6 +71,12 @@ exports.markAsRead = (req, res) => {
 // 알림 삭제
 exports.deleteNotification = (req, res) => {
   const { notification_id } = req.params;
+
+  // UUID 검증
+  if (!isUuid(notification_id)) {
+    return res.status(400).json({ message: 'Invalid UUID format' });
+  }
+
   snsAppResponse(
     res,
     notificationService.deleteNotification(notification_id),
