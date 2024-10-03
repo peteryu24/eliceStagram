@@ -11,8 +11,8 @@ const notificationRoute = require('./route/notificationRoute');
 
 app.use('/api/user', userRoute);
 app.use('/api/feed', feedRoute); 
-app.use('./api/comment',commentRoute);
-app.use('./api/notification',notificationRoute);
+app.use('/api/comment',commentRoute);
+app.use('/api/notification',notificationRoute);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

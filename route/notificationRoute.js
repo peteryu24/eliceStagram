@@ -6,15 +6,15 @@ const authMiddleware = require('../config/authMiddleware');
 router.use(authMiddleware);
 
 // 알림 생성
-router.post('/notifications', notificationController.createNotification);
+router.post('/', notificationController.createNotification);
 
 // 사용자의 모든 알림 조회
-router.get('/notifications/:receiver_id', notificationController.getNotificationsByUserId);
+router.get('/:receiver_id', notificationController.getNotificationsByUserId);
 
 // 알림 읽음 처리
-router.put('/notifications/:notification_id/read', notificationController.markAsRead);
+router.put('/:notification_id/read', notificationController.markAsRead);
 
 // 알림 삭제
-router.delete('/notifications/:notification_id', notificationController.deleteNotification);
+router.delete('/:notification_id', notificationController.deleteNotification);
 
 module.exports = router;

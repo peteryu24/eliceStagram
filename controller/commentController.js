@@ -110,6 +110,7 @@ exports.deleteComment = (req, res) => {
 
 // 댓글 좋아요 누르기
 exports.likeComment = (req, res) => {
+  console.log("Like comment called");
   const { comment_id } = req.params;
   const firebase_uid = req.firebase_uid;
 
