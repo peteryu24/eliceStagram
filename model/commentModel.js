@@ -25,11 +25,14 @@ exports.getCommentById = async (comment_id) => {
 exports.getAllCommentsByFeedId = async (feed_id) => {
   const query = `
     SELECT comment_id, firebase_uid, description, like_count, created_at 
-    FROM comment WHERE feed_id = $1;
+    FROM comment 
+    WHERE feed_id = $1
+    ORDER BY created_at DESC;  
   `;
   const result = await pool.query(query, [feed_id]);
   return result.rows;  
 };
+
 
 // 댓글 수정
 exports.updateComment = async (comment_id, description) => {
