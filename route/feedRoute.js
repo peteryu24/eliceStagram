@@ -1,13 +1,13 @@
 const express = require('express');
 const feedController = require('../controller/feedController');
-//const authMiddleware = require('../config/authMiddleware');
-const testAuthMiddleware = require('../config/testAuthMiddleware');
+const authMiddleware = require('../config/authMiddleware');
+// const testAuthMiddleware = require('../config/testAuthMiddleware');
 const uuidMiddleware = require('../config/uuidMiddleware');
 
 const router = express.Router();
 
-// router.use(authMiddleware);
-router.use(testAuthMiddleware);
+router.use(authMiddleware);
+// router.use(testAuthMiddleware);
 
 // 피드 생성
 router.post('/', feedController.createFeed);
