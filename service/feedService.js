@@ -1,4 +1,5 @@
 const feedModel = require('../model/feedModel');
+const redisHandle = require('../config/redisHandle');
 
 // 공통 에러 처리 함수
 const handleError = (action, error) => {
@@ -15,12 +16,15 @@ exports.createFeed = async (firebase_uid, description, imageUrls) => {
       await feedModel.addFeedImages(feedId, imageUrls);
     }
 
+    // 캐시 초기화 (피드 생성 시 캐시된 좋아요 및 댓글 수 삭제)
+    redisHandle.del(`feed:${feedId}:likeCount`);
+    redisHandle.del(`feed:${feedId}:commentCount`);
+
     return feedId;
   } catch (error) {
     handleError('creating feed', error);
   }
 };
-
 
 // 단일 피드 조회
 exports.getFeedById = async (feed_id) => {
@@ -53,6 +57,10 @@ exports.updateFeed = async (feed_id, firebase_uid, description) => {
       throw new Error('Permission denied');
     }
 
+    // 캐시 초기화 (수정 후 캐시 삭제)
+    redisHandle.del(`feed:${feed_id}:likeCount`);
+    redisHandle.del(`feed:${feed_id}:commentCount`);
+
     return await feedModel.updateFeed(feed_id, description);
   } catch (error) {
     handleError('updating feed', error);
@@ -72,6 +80,10 @@ exports.deleteFeed = async (feed_id, firebase_uid) => {
       throw new Error('Permission denied');
     }
 
+    // 캐시 삭제 (피드 삭제 시 캐시된 좋아요 및 댓글 수 삭제)
+    redisHandle.del(`feed:${feed_id}:likeCount`);
+    redisHandle.del(`feed:${feed_id}:commentCount`);
+
     return await feedModel.deleteFeed(feed_id);
   } catch (error) {
     handleError('deleting feed', error);
@@ -83,7 +95,10 @@ exports.updateFeedImage = async (firebase_uid, feed_id, image_id, newImageUrl) =
   try {
     const feed = await feedModel.getFeedById(feed_id);
 
-    if (!feed || feed.firebase_uid !== firebase_uid) {
+    if (!feed) {
+      throw new Error('Feed not found');
+    }
+    if (feed.firebase_uid !== firebase_uid) {
       throw new Error('Permission denied');
     }
 
@@ -98,7 +113,10 @@ exports.deleteFeedImage = async (firebase_uid, feed_id, image_id) => {
   try {
     const feed = await feedModel.getFeedById(feed_id);
 
-    if (!feed || feed.firebase_uid !== firebase_uid) {
+    if (!feed) {
+      throw new Error('Feed not found');
+    }
+    if (feed.firebase_uid !== firebase_uid) {
       throw new Error('Permission denied');
     }
 
@@ -112,7 +130,6 @@ exports.deleteFeedImage = async (firebase_uid, feed_id, image_id) => {
     handleError('deleting feed image', error);
   }
 };
-
 
 // 피드 좋아요 누르기
 exports.likeFeed = async (firebase_uid, feed_id) => {
@@ -129,7 +146,11 @@ exports.likeFeed = async (firebase_uid, feed_id) => {
       throw new Error('Already liked this feed');
     }
 
-    return await feedModel.likeFeed(firebase_uid, feed_id);
+    await feedModel.likeFeed(firebase_uid, feed_id);
+
+    // 좋아요 수 캐시 무효화
+    redisHandle.del(`feed:${feed_id}:likeCount`);
+    return true;
   } catch (error) {
     handleError('liking feed', error);
   }
@@ -150,7 +171,11 @@ exports.unlikeFeed = async (firebase_uid, feed_id) => {
       throw new Error('Not liked this feed before, cannot unlike');
     }
 
-    return await feedModel.unlikeFeed(firebase_uid, feed_id);
+    await feedModel.unlikeFeed(firebase_uid, feed_id);
+
+    // 좋아요 수 캐시 무효화
+    redisHandle.del(`feed:${feed_id}:likeCount`);
+    return true;
   } catch (error) {
     handleError('unliking feed', error);
   }
@@ -176,14 +201,54 @@ exports.checkLikeStatus = async (firebase_uid, feed_id) => {
 exports.getLikeCount = async (feed_id) => {
   try {
     feed_id = feed_id.trim();
+
+    // 캐시에서 좋아요 수 가져오기
+    const cachedLikeCount = await redisHandle.get(`feed:${feed_id}:likeCount`);
+    if (cachedLikeCount) {
+      return parseInt(cachedLikeCount, 10);
+    }
+
     const feed = await feedModel.getFeedById(feed_id);
 
     if (!feed) {
       throw new Error('Feed not found');
     }
 
-    return await feedModel.getLikeCount(feed_id);
+    const likeCount = await feedModel.getLikeCount(feed_id);
+
+    // 캐시에 좋아요 수 저장 (유효기간 10분 설정)
+    redisHandle.setex(`feed:${feed_id}:likeCount`, 600, likeCount);
+
+    return likeCount;
   } catch (error) {
     handleError('getting like count', error);
+  }
+};
+
+// 피드 댓글 수 확인 (캐시 적용)
+exports.getCommentCount = async (feed_id) => {
+  try {
+    feed_id = feed_id.trim();
+
+    // 캐시에서 댓글 수 가져오기
+    const cachedCommentCount = await redisHandle.get(`feed:${feed_id}:commentCount`);
+    if (cachedCommentCount) {
+      return parseInt(cachedCommentCount, 10);
+    }
+
+    const feed = await feedModel.getFeedById(feed_id);
+
+    if (!feed) {
+      throw new Error('Feed not found');
+    }
+
+    const commentCount = await feedModel.getCommentCount(feed_id);
+
+    // 캐시에 댓글 수 저장 (유효기간 10분 설정)
+    redisHandle.setex(`feed:${feed_id}:commentCount`, 600, commentCount);
+
+    return commentCount;
+  } catch (error) {
+    handleError('getting comment count', error);
   }
 };

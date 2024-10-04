@@ -1,11 +1,11 @@
 const express = require('express');
 const commentController = require('../controller/commentController');
-const authMiddleware = require('../config/authMiddleware');
+const testAuthMiddleware = require('../config/testAuthMiddleware');
 const uuidMiddleware = require('../config/uuidMiddleware');
 
 const router = express.Router();
 
-router.use(authMiddleware);
+router.use(testAuthMiddleware);
 
 // 댓글 생성
 router.post('/:feed_id', uuidMiddleware('feed_id'), commentController.createComment);
