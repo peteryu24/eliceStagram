@@ -1,4 +1,3 @@
-<h1 align="center">Welcome to eliceStagram 👋</h1>
 <p>
   <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000" />
   <a href="#" target="_blank">
@@ -7,6 +6,7 @@
 </p>
 
 > simple social media app
+
 
 ## Install
 
@@ -20,16 +20,17 @@ npm install
 npm run test
 ```
 
-## Author
+## gitignore
 
-👤 **peterCoding**
+* **.env**
+    * path: `config/script/.env`
+    * usage: 
+      - database connection details
+      - used in `config/database.js`
 
-* Website: https://github.com/peteryu24
-* Github: [@dudefromkorea](https://github.com/dudefromkorea)
+* **firebaseServiceAccountKey.json**
+    * path: `/config/script/firebaseServiceAccountKey.json`
+    * usage: 
+      - firebase Auth
+      - used in `config/firebaseAdmin.js`
 
-## Show your support
-
-Give a ⭐️ if this project helped you!
-
-***
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
