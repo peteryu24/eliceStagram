@@ -34,7 +34,7 @@ npm run test
       - firebase Auth
       - used in `config/firebaseAdmin.js`     
 
-## API URL
+## API documentation
 ### User
 | API Endpoint           | HTTP Method | URL                          | Authorization Header      | Body Parameters                                | Success Response                                                  | Failure Response                                                        |
 |------------------------|-------------|------------------------------|---------------------------|------------------------------------------------|------------------------------------------------------------------|-------------------------------------------------------------------------|
