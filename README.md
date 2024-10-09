@@ -33,6 +33,10 @@ npm run test
     * usage: 
       - firebase Auth
       - used in `config/firebaseAdmin.js`     
+<br>
+
+[Swagger API Documentation](https://dudefromkorea.tistory.com/156)
+
 
 ## API documentation
 ### User
