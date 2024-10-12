@@ -6,7 +6,7 @@
 </p>
 
 > simple social media app
-
+ 
 
 ## Install
 
