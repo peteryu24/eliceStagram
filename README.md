@@ -5,7 +5,7 @@
   </a>
 </p>
 
-> simple social media app
+> simple social media app 
  
 
 ## Install
