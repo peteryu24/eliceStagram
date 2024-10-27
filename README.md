@@ -12,7 +12,7 @@
 
 ```sh
 npm install
-```
+``` 
 
 ## Run tests
 
