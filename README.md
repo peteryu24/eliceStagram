@@ -4,7 +4,7 @@
     <img alt="License: ISC" src="https://img.shields.io/badge/License-ISC-yellow.svg" />
   </a>
 </p>
-  
+   
 > simple social media app     
   
 
