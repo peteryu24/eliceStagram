@@ -8,7 +8,7 @@
 > simple social media app     
   
 
-## Install
+## Install 
 
 ```sh
 npm install
